@@ -33,7 +33,8 @@ def _system_disk_indexes():
         out = subprocess.run(
             ["powershell", "-NoProfile", "-Command",
              "Get-Partition -DriveLetter C | Select-Object DiskNumber | ConvertTo-Json"],
-            capture_output=True, text=True, timeout=30).stdout
+            capture_output=True, text=True, timeout=30,
+        creationflags=subprocess.CREATE_NO_WINDOW).stdout
         data = json.loads(out or "{}")
         if isinstance(data, dict):
             data = [data]
@@ -47,7 +48,8 @@ def list_disks():
     out = subprocess.run(
         ["powershell", "-NoProfile", "-Command",
          "Get-CimInstance Win32_DiskDrive | Select-Object Index,Model,Size | ConvertTo-Json"],
-        capture_output=True, text=True, timeout=30).stdout
+        capture_output=True, text=True, timeout=30,
+        creationflags=subprocess.CREATE_NO_WINDOW).stdout
     data = json.loads(out or "[]")
     if isinstance(data, dict):
         data = [data]
@@ -119,7 +121,8 @@ class Mount:
         log(f"вешаю букву {self.letter}…")
         r = subprocess.run(["net", "use", self.letter,
                             f"\\\\127.0.0.1@{self.dav_port}\\DavWWWRoot"],
-                           capture_output=True, text=True, timeout=60)
+                           capture_output=True, text=True, timeout=60,
+                           creationflags=subprocess.CREATE_NO_WINDOW)
         if r.returncode != 0:
             raise IOError(f"net use: {r.stderr.strip() or r.stdout.strip()}")
         log(f"готово: {self.volume.name} → {self.letter}")
@@ -127,7 +130,8 @@ class Mount:
     def stop(self, log):
         if self.letter:
             subprocess.run(["net", "use", self.letter, "/delete", "/y"],
-                           capture_output=True, text=True, timeout=30)
+                           capture_output=True, text=True, timeout=30,
+                           creationflags=subprocess.CREATE_NO_WINDOW)
             log(f"буква {self.letter} снята")
             self.letter = None
         if self.httpd:
