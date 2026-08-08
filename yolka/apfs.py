@@ -261,7 +261,8 @@ class Volume:
                             break
                         dpos += (xsz + 7) & ~7
             return {"parent": u64(v, 0), "private_id": u64(v, 8),
-                    "mode": u16(v, 80), "bsd_flags": u32(v, 68), "size": size}
+                    "mode": u16(v, 80), "bsd_flags": u32(v, 68), "size": size,
+                    "ctime": u64(v, 16) / 1e9, "mtime": u64(v, 24) / 1e9}
         return None
 
     def _read_stream(self, stream_id, size):
