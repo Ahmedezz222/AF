@@ -21,6 +21,14 @@ spruce-tree emoji. The Paragon driver couldn't handle an emoji in the name
 One little picture in a folder name, and a paid driver was helpless while
 the data sat locked away.
 
+Yes, by the classic rules of good taste, an emoji in a folder name is a
+"don't" — you never know what program the file will pass through later.
+I knew that. But macOS supports such names perfectly, and it had all worked
+for years — so why not? The little spruce was nice to look at and bothered
+no one. Until a driver that wasn't ready for a perfectly valid name ended up
+in the chain. Exactly what that rule warns about — and a live proof that the
+warning isn't idle.
+
 ## The journey
 
 If the driver stumbles on the name, then the disk has to be read **around
