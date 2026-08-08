@@ -22,10 +22,9 @@ automatically.
 
 A commercial APFS driver refused to open a folder from a Time Machine backup —
 it choked on an emoji (`🌲`) in the folder name, a surrogate-pair bug in its
-filename handling. The data inside was a Telegram content pipeline that needed
-rescuing. So this project reads the file system directly from the raw disk,
-bypassing the driver entirely. The spruce that broke everything gave the
-project its name.
+filename handling. The files I needed were locked inside. So this project reads
+the file system directly from the raw disk, bypassing the driver entirely.
+The spruce that broke everything gave the project its name.
 
 **[Read the full story → STORY.md](STORY.md)** · [по-русски](STORY.ru.md)
 

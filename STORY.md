@@ -12,13 +12,8 @@ a commercial driver ($49.95 on the official site today), the standard
 sells that as a separate product for separate money — so I ended up with two
 paid drivers instead of one.
 
-Almost everything opened. Except one folder.
-
-That folder held the most important thing — my "content factory": a system
-that gathered news from a dozen sources, translated it, wrote posts, and
-published them to my Telegram channel. Five hundred-plus finished posts, the
-code, the settings. And that one folder wouldn't open. Explorer stumbled,
-the driver went silent.
+Almost everything opened. Except one folder — and, of course, the one with
+the files I needed most. Explorer stumbled, the driver went silent.
 
 The reason was absurd: the folder was named **`🌲 Workspace`** — with a
 spruce-tree emoji. The Paragon driver couldn't handle an emoji in the name
@@ -43,9 +38,8 @@ It turned out to be a one-day road, but with a few forks:
    forensic library I tried first broke on this very disk, exactly where my
    own parser went through.
 
-3. **Get the data out.** The spruce-tree folder opened. Five hundred and
-   eighty-four posts, the whole factory codebase, the settings with a working
-   bot token — all back on the computer.
+3. **Get the data out.** The spruce-tree folder opened. Everything that had
+   been locked away was back on the computer.
 
 ## The solution
 
