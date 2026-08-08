@@ -18,17 +18,40 @@ IDLE_EXIT = 3 * 3600
 
 
 def main(device, port=47831):
-    dev = open(device, "rb", buffering=0)
+    dev = [open(device, "rb", buffering=0)]
     lock = threading.Lock()
     last = [time.time()]
+
+    def reopen():
+        """Переоткрывает устройство — лечит битую ручку после
+        передёргивания диска: Windows аннулирует старый handle,
+        и чтение начинает возвращать пустоту или падать с ошибкой."""
+        try:
+            dev[0].close()
+        except Exception:
+            pass
+        dev[0] = open(device, "rb", buffering=0)
 
     def read_aligned(offset, size):
         a_start = (offset // SECTOR) * SECTOR
         a_end = ((offset + size + SECTOR - 1) // SECTOR) * SECTOR
+        want = a_end - a_start
         with lock:
-            dev.seek(a_start)
-            data = dev.read(a_end - a_start)
-        return data[offset - a_start: offset - a_start + size]
+            for attempt in range(2):
+                try:
+                    dev[0].seek(a_start)
+                    data = dev[0].read(want)
+                except OSError:
+                    data = b""
+                # непустой ответ = успех; пустой на непустой запрос = битая ручка
+                if data or want == 0:
+                    return data[offset - a_start: offset - a_start + size]
+                if attempt == 0:
+                    try:
+                        reopen()  # одна попытка переоткрыть и повторить
+                    except OSError:
+                        break
+            return b""
 
     def handle(conn):
         try:

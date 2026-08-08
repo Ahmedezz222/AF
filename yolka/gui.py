@@ -74,6 +74,25 @@ def port_open(port):
         return False
 
 
+def server_reads_ok(port):
+    """Проверяет, что сервер на порту реально читает диск,
+    а не держит битую ручку (после передёргивания винта)."""
+    try:
+        s = socket.create_connection(("127.0.0.1", port), timeout=3)
+        s.sendall(struct.pack("<QQ", 0, 512))
+        n = struct.unpack("<Q", s.recv(8))[0]
+        buf = b""
+        while len(buf) < n:
+            chunk = s.recv(n - len(buf))
+            if not chunk:
+                break
+            buf += chunk
+        s.close()
+        return len(buf) == 512
+    except OSError:
+        return False
+
+
 def stop_raw_server(port):
     try:
         with socket.create_connection(("127.0.0.1", port), timeout=2) as s:
@@ -93,6 +112,14 @@ class Mount:
         self.httpd = None
 
     def start(self, log):
+        # зомби после передёргивания диска: порт занят, но чтение мёртвое
+        if port_open(self.raw_port) and not server_reads_ok(self.raw_port):
+            log("старый сервер не читает диск — перезапускаю…")
+            stop_raw_server(self.raw_port)
+            for _ in range(20):
+                if not port_open(self.raw_port):
+                    break
+                time.sleep(0.2)
         if not port_open(self.raw_port):
             log("запускаю сервер чтения (окно UAC — нажмите «Да»)…")
             rc = ctypes.windll.shell32.ShellExecuteW(

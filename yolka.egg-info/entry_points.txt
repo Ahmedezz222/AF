@@ -1,0 +1,6 @@
+[console_scripts]
+yolka = yolka.cli:main
+yolka-dav = yolka.dav:main
+
+[gui_scripts]
+yolka-gui = yolka.gui:main
