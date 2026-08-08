@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Сервер чтения диска. Запускается с правами администратора один раз,
+r"""Сервер чтения диска. Запускается с правами администратора один раз,
 дальше yolka работает без повышения прав.
 
     python -m yolka.server \\.\PhysicalDrive1 [порт]
@@ -41,6 +41,10 @@ def main(device, port=47831):
                     hdr += part
                 off, size = struct.unpack("<QQ", hdr)
                 last[0] = time.time()
+                if off == 0 and size == 0xFFFFFFFFFFFFFFFF:
+                    # команда выключения (доступна только с localhost)
+                    conn.sendall(struct.pack("<Q", 0))
+                    os._exit(0)
                 if size > 64 * 1024 * 1024:
                     conn.sendall(struct.pack("<Q", 0))
                     continue

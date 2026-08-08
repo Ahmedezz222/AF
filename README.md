@@ -70,6 +70,19 @@ Python 3.10+, zero third-party packages — clone and run.
 
 ## Usage
 
+### The easy way — the GUI
+
+```bash
+python -m yolka.gui
+```
+
+A window lists your disks; hit «Mount» and the Mac drive appears on a free
+drive letter under its real volume name. «Unmount» removes the letter and
+shuts everything down. Admin rights are requested via a single UAC prompt
+on mount.
+
+### Or by hand, step by step
+
 ```bash
 # 1. one UAC prompt (raw disk access):
 python -m yolka.server \\.\PhysicalDrive1

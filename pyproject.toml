@@ -24,5 +24,8 @@ classifiers = [
 yolka = "yolka.cli:main"
 yolka-dav = "yolka.dav:main"
 
+[project.gui-scripts]
+yolka-gui = "yolka.gui:main"
+
 [tool.setuptools]
 packages = ["yolka"]
