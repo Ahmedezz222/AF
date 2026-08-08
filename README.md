@@ -8,6 +8,9 @@
 
 **Read-only Mac disk driver for Windows in pure Python — no kernel drivers, no dependencies.**
 
+![A Mac HFS+ drive mounted as Y: in Windows Explorer](docs/explorer.png)
+*An HFS+ drive from a Mac, mounted as drive Y: in Windows Explorer — labeled with its real volume name.*
+
 Reads both Apple file systems — **APFS** (macOS 10.13+) and **HFS+** (Mac OS
 Extended, the older one) — and mounts them as a regular Windows drive letter,
 using the WebDAV client built into Windows itself. The format is detected
