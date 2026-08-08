@@ -27,8 +27,23 @@ RAW_PORT_BASE = 47831
 DAV_PORT_BASE = 8809
 
 
+def _system_disk_indexes():
+    """Номера дисков, на которых живёт Windows (C:) — их не показываем."""
+    try:
+        out = subprocess.run(
+            ["powershell", "-NoProfile", "-Command",
+             "Get-Partition -DriveLetter C | Select-Object DiskNumber | ConvertTo-Json"],
+            capture_output=True, text=True, timeout=30).stdout
+        data = json.loads(out or "{}")
+        if isinstance(data, dict):
+            data = [data]
+        return {d["DiskNumber"] for d in data}
+    except Exception:
+        return set()
+
+
 def list_disks():
-    """[(index, model, size_gb)] физических дисков."""
+    """[(index, model, size_gb)] физических дисков, кроме системного."""
     out = subprocess.run(
         ["powershell", "-NoProfile", "-Command",
          "Get-CimInstance Win32_DiskDrive | Select-Object Index,Model,Size | ConvertTo-Json"],
@@ -36,8 +51,10 @@ def list_disks():
     data = json.loads(out or "[]")
     if isinstance(data, dict):
         data = [data]
+    skip = _system_disk_indexes()
     return sorted((d["Index"], d.get("Model") or "?",
-                   round((d.get("Size") or 0) / 1e9)) for d in data)
+                   round((d.get("Size") or 0) / 1e9))
+                  for d in data if d["Index"] not in skip)
 
 
 def free_letter():
