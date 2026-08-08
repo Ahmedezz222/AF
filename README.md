@@ -27,6 +27,8 @@ rescuing. So this project reads the file system directly from the raw disk,
 bypassing the driver entirely. The spruce that broke everything gave the
 project its name.
 
+**[Read the full story → STORY.md](STORY.md)** · [по-русски](STORY.ru.md)
+
 ## What it does
 
 - parses APFS from raw bytes: GPT, checkpoints, object maps, B-trees;

@@ -1,0 +1,67 @@
+# How one spruce tree broke a $40 driver
+
+[Читать по-русски →](STORY.ru.md)
+
+## The problem
+
+I was moving from a Mac to Windows. All my data lived on an external drive —
+a Time Machine backup formatted in APFS, macOS's native file system. Windows
+can't read those out of the box, so I installed Paragon APFS for Windows —
+a commercial driver, about $40, the standard "just works" solution.
+
+Almost everything opened. Except one folder.
+
+That folder held the most important thing — my "content factory": a system
+that gathered news from a dozen sources, translated it, wrote posts, and
+published them to my Telegram channel. Five hundred-plus finished posts, the
+code, the settings. And that one folder wouldn't open. Explorer stumbled,
+the driver went silent.
+
+The reason was absurd: the folder was named **`🌲 Workspace`** — with a
+spruce-tree emoji. The Paragon driver couldn't handle an emoji in the name
+(technically, Unicode "surrogate pairs") and simply refused to enter it.
+One little picture in a folder name, and a paid driver was helpless while
+the data sat locked away.
+
+## The journey
+
+If the driver stumbles on the name, then the disk has to be read **around
+the driver** — directly, at the byte level. APFS has an open specification;
+its structures can be parsed by hand.
+
+It turned out to be a one-day road, but with a few forks:
+
+1. **Reach the disk.** Windows won't let you read a physical disk without
+   administrator rights. So I built a tiny read server that takes the single
+   elevation prompt, while everything else runs as a normal user.
+
+2. **Parse APFS by hand.** The partition table, checkpoints, object maps,
+   the catalog B-trees — all parsed from raw bytes in pure Python. A ready
+   forensic library I tried first broke on this very disk, exactly where my
+   own parser went through.
+
+3. **Get the data out.** The spruce-tree folder opened. Five hundred and
+   eighty-four posts, the whole factory codebase, the settings with a working
+   bot token — all back on the computer.
+
+## The solution
+
+Then it became clear that the rescue operation had produced a tool people
+are missing. That's how **yolka** 🌲 was born — a read-only Mac-disk driver
+for Windows:
+
+- reads **both** of Apple's file systems — APFS (new) and HFS+ (old);
+- mounts the disk as a **drive letter in Explorer** via a mechanism built
+  into Windows — you browse a Mac disk with the mouse like any USB stick;
+- **pure Python, zero dependencies**, no kernel drivers;
+- **read-only** — it cannot damage the disk, by design;
+- names with emoji, Cyrillic, anything — the spruce that started it all
+  breaks nothing anymore.
+
+Validated on two real disks: an APFS Time Machine backup and a 1 TB HFS+ drive.
+
+The niche turned out to be surprisingly empty: there was no free tool that
+reads **both** formats on Windows and mounts them as a drive letter — only
+the paid Paragon and MacDrive. Now there is.
+
+The spruce tree that started it all gave the project its name.
