@@ -66,4 +66,5 @@ The niche turned out to be surprisingly empty: there was no free tool that
 reads **both** formats on Windows and mounts them as a drive letter — only
 the paid Paragon and MacDrive. Now there is.
 
-The spruce tree that started it all gave the project its name.
+The spruce tree that started it all gave the project its name — *yolka*
+(ёлка) is Russian for a spruce, the Christmas tree.

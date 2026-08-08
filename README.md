@@ -8,6 +8,9 @@
 
 **Read-only Mac disk driver for Windows in pure Python — no kernel drivers, no dependencies.**
 
+*yolka* (ёлка) is Russian for a spruce — the Christmas tree. An emoji spruce
+in a folder name is what broke the paid driver and started this whole thing.
+
 ![A Mac HFS+ drive mounted as Y: in Windows Explorer](docs/explorer.png)
 *An HFS+ drive from a Mac, mounted as drive Y: in Windows Explorer — labeled with its real volume name.*
 
