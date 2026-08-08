@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "yolka"
-version = "0.1.0"
+version = "0.1.1"
 description = "Read-only APFS driver for Windows in pure Python: mounts Mac disks and Time Machine backups via built-in WebDAV"
 readme = "README.md"
 license = { text = "MIT" }
