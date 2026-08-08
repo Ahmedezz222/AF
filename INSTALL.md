@@ -1,5 +1,7 @@
 # Installing yolka
 
+[Читать по-русски →](INSTALL.ru.md)
+
 ## Prerequisites
 
 | What | Why | Where |
