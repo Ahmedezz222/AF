@@ -1,9 +1,11 @@
 # 🌲 yolka
 
-**Read-only APFS driver for Windows in pure Python — no kernel drivers, no dependencies.**
+**Read-only Mac disk driver for Windows in pure Python — no kernel drivers, no dependencies.**
 
-Mounts Apple File System disks (including Time Machine backups) as a regular
-Windows drive letter, using the WebDAV client built into Windows itself.
+Reads both Apple file systems — **APFS** (macOS 10.13+) and **HFS+** (Mac OS
+Extended, the older one) — and mounts them as a regular Windows drive letter,
+using the WebDAV client built into Windows itself. The format is detected
+automatically.
 
 [Читать по-русски →](README.ru.md)
 
@@ -19,7 +21,9 @@ project its name.
 ## What it does
 
 - parses APFS from raw bytes: GPT, checkpoints, object maps, B-trees;
-- finds the latest valid checkpoint (survives an unclean unmount);
+- parses HFS+ too: catalog and extents B-trees, big-endian and all
+  (validated on synthetic images — real-disk reports welcome);
+- finds the latest valid APFS checkpoint (survives an unclean unmount);
 - mounts the volume as a Windows drive letter via built-in WebDAV — browse
   in Explorer, open files in any app;
 - CLI for scripted use: `ls`, `extract`, `info`;

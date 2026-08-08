@@ -14,7 +14,8 @@
 import argparse
 import sys
 
-from .apfs import RawDevice, ServerDevice, Volume
+from . import open_volume
+from .apfs import RawDevice, ServerDevice
 
 
 def make_volume(args):
@@ -24,7 +25,7 @@ def make_volume(args):
         dev = RawDevice(args.device)
     else:
         dev = ServerDevice(port=args.port)
-    return Volume(dev)
+    return open_volume(dev)
 
 
 def main(argv=None):

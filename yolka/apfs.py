@@ -118,6 +118,8 @@ J_INODE, J_XATTR, J_FILE_EXTENT, J_DREC = 3, 4, 8, 9
 class Volume:
     """Один том APFS-контейнера, открытый на последней контрольной точке."""
 
+    ROOT_ID = ROOT_DIR_ID
+
     def __init__(self, dev, part_offset=None):
         if part_offset is None:
             part_offset = find_apfs_partition(dev)

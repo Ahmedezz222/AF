@@ -19,7 +19,8 @@ import urllib.parse
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from xml.sax.saxutils import escape
 
-from .apfs import RawDevice, ServerDevice, Volume
+from . import open_volume
+from .apfs import RawDevice, ServerDevice
 
 DIR = 0o040000
 REG = 0o100000
@@ -49,7 +50,7 @@ class DavState:
 
     def resolve(self, path):
         """path ('/a/b') → (fid, inode) либо KeyError."""
-        cur = 2  # корневой каталог
+        cur = self.vol.ROOT_ID
         walked = ""
         for part in [p for p in path.split("/") if p]:
             entries = self.listing(walked or "/", cur)
@@ -201,7 +202,7 @@ def main():
         dev = RawDevice(args.device)
     else:
         dev = ServerDevice(port=args.raw_port)
-    serve(Volume(dev), port=args.port)
+    serve(open_volume(dev), port=args.port)
 
 
 if __name__ == "__main__":
