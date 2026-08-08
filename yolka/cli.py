@@ -14,18 +14,16 @@
 import argparse
 import sys
 
-from . import open_volume
+from . import open_volume, list_volumes
 from .apfs import RawDevice, ServerDevice
 
 
-def make_volume(args):
+def make_device(args):
     if args.image:
-        dev = RawDevice(args.image)
-    elif args.device:
-        dev = RawDevice(args.device)
-    else:
-        dev = ServerDevice(port=args.port)
-    return open_volume(dev)
+        return RawDevice(args.image)
+    if args.device:
+        return RawDevice(args.device)
+    return ServerDevice(port=args.port)
 
 
 def main(argv=None):
@@ -33,6 +31,7 @@ def main(argv=None):
     p.add_argument("--image", help="путь к образу диска")
     p.add_argument("--device", help=r"raw-устройство, например \\.\PhysicalDrive1 (нужен администратор)")
     p.add_argument("--port", type=int, default=47831, help="порт yolka-сервера (по умолчанию 47831)")
+    p.add_argument("--vol", type=int, default=0, help="номер тома APFS (список: команда volumes)")
     sub = p.add_subparsers(dest="cmd", required=True)
 
     p_ls = sub.add_parser("ls", help="показать каталог")
@@ -43,9 +42,17 @@ def main(argv=None):
     p_ex.add_argument("dst")
 
     p_info = sub.add_parser("info", help="информация о томе")
+    sub.add_parser("volumes", help="список томов на диске")
 
     args = p.parse_args(argv)
-    vol = make_volume(args)
+    dev = make_device(args)
+
+    if args.cmd == "volumes":
+        for i, name, kind in list_volumes(dev):
+            print(f"{i}\t{name}\t({kind})")
+        return
+
+    vol = open_volume(dev, vol=args.vol)
 
     if args.cmd == "info":
         kind = "APFS" if hasattr(vol, "xid") else "HFS+"

@@ -213,6 +213,7 @@ def main():
     p.add_argument("--device", help=r"raw-устройство (нужен администратор)")
     p.add_argument("--raw-port", type=int, default=47831, help="порт yolka-сервера чтения")
     p.add_argument("--port", type=int, default=8809, help="порт WebDAV (по умолчанию 8809)")
+    p.add_argument("--vol", type=int, default=0, help="номер тома APFS (список: python -m yolka volumes)")
     args = p.parse_args()
     if args.image:
         dev = RawDevice(args.image)
@@ -220,7 +221,7 @@ def main():
         dev = RawDevice(args.device)
     else:
         dev = ServerDevice(port=args.raw_port)
-    serve(open_volume(dev), port=args.port)
+    serve(open_volume(dev, vol=args.vol), port=args.port)
 
 
 if __name__ == "__main__":

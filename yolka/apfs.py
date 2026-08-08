@@ -128,7 +128,7 @@ class Volume:
 
     ROOT_ID = ROOT_DIR_ID
 
-    def __init__(self, dev, part_offset=None):
+    def __init__(self, dev, part_offset=None, vol_index=0):
         if part_offset is None:
             part_offset = find_apfs_partition(dev)
         self.d = CachedSlice(dev, part_offset)
@@ -151,14 +151,18 @@ class Volume:
                     self.xid, nxsb = x, blk
 
         self.nx_omap_oid = u64(nxsb, 0xA0)
-        fs_oid = next((u64(nxsb, 0xB8 + i * 8) for i in range(100)
-                       if u64(nxsb, 0xB8 + i * 8)), 0)
-        if fs_oid == 0:
-            # берём первый оид из омапа контейнера
+        fs_oids = [u64(nxsb, 0xB8 + i * 8) for i in range(100)
+                   if u64(nxsb, 0xB8 + i * 8)]
+        if not fs_oids:
+            # берём оиды из омапа контейнера
             om = self.d.block(self.nx_omap_oid)
             root = self.d.block(u64(om, 0x30))
             _, _, entries = self._node(root)
-            fs_oid = u64(root, entries[0][0])
+            fs_oids = [u64(root, e[0]) for e in entries]
+        self.volume_count = len(fs_oids)
+        if not (0 <= vol_index < len(fs_oids)):
+            raise IOError(f"тома №{vol_index} нет: в контейнере {len(fs_oids)} том(ов)")
+        fs_oid = fs_oids[vol_index]
 
         apsb_paddr = self._omap_lookup(self.nx_omap_oid, fs_oid)
         apsb = self.d.block(apsb_paddr)
