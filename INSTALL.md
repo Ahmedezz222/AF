@@ -101,10 +101,28 @@ non-Latin names work fine.
 `net start WebClient` (elevated), then retry.
 
 **Large files fail to copy from Y:** — the built-in Windows WebDAV client
-caps files at 50 MB. Either raise the limit in the registry
-(`HKLM\SYSTEM\CurrentControlSet\Services\WebClient\Parameters` →
-`FileSizeLimitInBytes` = `4294967295`, restart WebClient), or extract big
-files with `python -m yolka extract`, which has no limit.
+caps files at 50 MB (an early-2000s safety valve: the client downloads each
+file to a temp folder in full, and big files over slow networks used to hang
+Explorer; the number was never revisited).
+
+Option 1 — raise the cap to its maximum (elevated, once):
+
+```bash
+reg add "HKLM\SYSTEM\CurrentControlSet\Services\WebClient\Parameters" /v FileSizeLimitInBytes /t REG_DWORD /d 4294967295 /f
+net stop WebClient
+net start WebClient
+```
+
+The new ceiling is 4 GB — a hard limit of the client (the value is a 32-bit
+DWORD; it physically cannot hold more).
+
+Option 2 — any size, no system changes:
+
+```bash
+python -m yolka extract "path/to/big/file" "C:\rescued"
+```
+
+`extract` reads the disk directly, bypassing WebClient — no limits, and faster.
 
 **"no NXSB superblock"** — wrong disk number, or the partition isn't APFS.
 Re-check step 3.
