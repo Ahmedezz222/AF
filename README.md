@@ -49,6 +49,11 @@ rights, but nobody wants to run a file server elevated. `yolka.server` is a
 50-line read-only proxy that takes the single UAC prompt; everything else runs
 as a normal user.
 
+## Installation
+
+See **[INSTALL.md](INSTALL.md)** for the full guide. Short version: Windows 10/11,
+Python 3.10+, zero third-party packages — clone and run.
+
 ## Usage
 
 ```bash
