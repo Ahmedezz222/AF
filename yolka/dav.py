@@ -45,7 +45,11 @@ class DavState:
     def listing(self, path, fid):
         with self.lock:
             if path not in self.dirs:
-                self.dirs[path] = self.vol.list_dir(fid)
+                raw = self.vol.list_dir(fid)
+                # системные записи HFS+ содержат управляющие символы
+                # (например «\0\0\0\0HFS+ Private Data») — XML их не переживает
+                self.dirs[path] = {n: f for n, f in raw.items()
+                                   if not any(ord(c) < 0x20 for c in n)}
             return self.dirs[path]
 
     def resolve(self, path):

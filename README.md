@@ -22,7 +22,8 @@ project its name.
 
 - parses APFS from raw bytes: GPT, checkpoints, object maps, B-trees;
 - parses HFS+ too: catalog and extents B-trees, big-endian and all
-  (validated on synthetic images — real-disk reports welcome);
+  (validated on a real 1 TB HFS+ drive and on synthetic images);
+- understands GPT and MBR partition tables alike;
 - finds the latest valid APFS checkpoint (survives an unclean unmount);
 - mounts the volume as a Windows drive letter via built-in WebDAV — browse
   in Explorer, open files in any app;

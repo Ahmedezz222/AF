@@ -379,22 +379,31 @@ class HFSVolume:
 
 
 def find_hfs_partition(dev):
-    """Ищет HFS+-раздел: сам том или GPT."""
+    """Ищет HFS+-раздел: сам том, GPT или MBR."""
     vh = dev.read(1024, 2)
     if vh in (b"H+", b"HX"):
         return 0
     hdr = dev.read(512, 512)
-    if hdr[:8] != b"EFI PART":
-        raise IOError("не найден ни том HFS+, ни GPT")
-    part_lba = struct.unpack_from("<q", hdr, 72)[0]
-    nparts = struct.unpack_from("<I", hdr, 80)[0]
-    entsz = struct.unpack_from("<I", hdr, 84)[0]
-    table = dev.read(part_lba * 512, nparts * entsz)
-    for i in range(nparts):
-        e = table[i * entsz:(i + 1) * entsz]
-        if e[:16] == HFSPLUS_TYPE_GUID:
-            first = struct.unpack_from("<q", e, 32)[0]
-            off = first * 512
+    if hdr[:8] == b"EFI PART":
+        part_lba = struct.unpack_from("<q", hdr, 72)[0]
+        nparts = struct.unpack_from("<I", hdr, 80)[0]
+        entsz = struct.unpack_from("<I", hdr, 84)[0]
+        table = dev.read(part_lba * 512, nparts * entsz)
+        for i in range(nparts):
+            e = table[i * entsz:(i + 1) * entsz]
+            if e[:16] == HFSPLUS_TYPE_GUID:
+                off = struct.unpack_from("<q", e, 32)[0] * 512
+                if dev.read(off + 1024, 2) in (b"H+", b"HX"):
+                    return off
+        raise IOError("HFS+-раздел в GPT не найден")
+    mbr = dev.read(0, 512)
+    if mbr[510:512] == b"\x55\xaa":
+        # MBR: тип 0xAF = Apple HFS+; на всякий случай проверяем и остальные
+        for i in range(4):
+            e = mbr[446 + i * 16: 462 + i * 16]
+            if not e[4]:
+                continue
+            off = struct.unpack_from("<I", e, 8)[0] * 512
             if dev.read(off + 1024, 2) in (b"H+", b"HX"):
                 return off
-    raise IOError("HFS+-раздел в GPT не найден")
+    raise IOError("том HFS+ не найден ни напрямую, ни в GPT, ни в MBR")

@@ -48,7 +48,9 @@ def main(argv=None):
     vol = make_volume(args)
 
     if args.cmd == "info":
-        print(f"том: {vol.name!r}, контрольная точка xid={vol.xid}")
+        kind = "APFS" if hasattr(vol, "xid") else "HFS+"
+        extra = f", контрольная точка xid={vol.xid}" if hasattr(vol, "xid") else ""
+        print(f"том: {vol.name!r} ({kind}{extra})")
     elif args.cmd == "ls":
         fid = vol.resolve_path(args.path)
         for name, child in sorted(vol.list_dir(fid).items()):
