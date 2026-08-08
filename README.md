@@ -1,5 +1,11 @@
 # 🌲 yolka
 
+![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue)
+![Windows](https://img.shields.io/badge/platform-Windows%2010%2F11-0078D6)
+![License: MIT](https://img.shields.io/badge/license-MIT-green)
+![Dependencies: zero](https://img.shields.io/badge/dependencies-zero-brightgreen)
+![Read-only](https://img.shields.io/badge/mode-read--only-orange)
+
 **Read-only Mac disk driver for Windows in pure Python — no kernel drivers, no dependencies.**
 
 Reads both Apple file systems — **APFS** (macOS 10.13+) and **HFS+** (Mac OS

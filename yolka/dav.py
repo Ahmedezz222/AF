@@ -185,9 +185,23 @@ class Handler(BaseHTTPRequestHandler):
     do_HEAD = do_GET
 
 
+def _set_explorer_label(host, port, label):
+    """Подписывает будущий сетевой диск именем тома (иначе Проводник
+    покажет техническое «DavWWWRoot (\\\\host@port)»)."""
+    try:
+        import winreg
+        key = (r"Software\Microsoft\Windows\CurrentVersion\Explorer"
+               r"\MountPoints2\##%s@%s#DavWWWRoot" % (host, port))
+        with winreg.CreateKey(winreg.HKEY_CURRENT_USER, key) as k:
+            winreg.SetValueEx(k, "_LabelFromReg", 0, winreg.REG_SZ, label)
+    except Exception:
+        pass  # не Windows или нет доступа — просто останется техническое имя
+
+
 def serve(volume, host="127.0.0.1", port=8809):
     Handler.state = DavState(volume)
     srv = ThreadingHTTPServer((host, port), Handler)
+    _set_explorer_label(host, port, f"{volume.name} (yolka)")
     print(f"yolka-dav: том {volume.name!r} на http://{host}:{port}/")
     print(f"подключить диском:  net use Y: \\\\{host}@{port}\\DavWWWRoot")
     srv.serve_forever()

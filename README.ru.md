@@ -1,5 +1,10 @@
 # 🌲 yolka
 
+![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue)
+![Windows](https://img.shields.io/badge/платформа-Windows%2010%2F11-0078D6)
+![Лицензия: MIT](https://img.shields.io/badge/лицензия-MIT-green)
+![Зависимости: ноль](https://img.shields.io/badge/зависимости-ноль-brightgreen)
+
 **Читатель маковских дисков для Windows на чистом Python — без драйверов ядра и зависимостей.**
 
 Читает обе файловые системы Apple — **APFS** (macOS 10.13+) и **HFS+**
