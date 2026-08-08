@@ -41,10 +41,7 @@ It turned out to be a one-day road, but with a few forks:
    administrator rights. So I built a tiny read server that takes the single
    elevation prompt, while everything else runs as a normal user.
 
-2. **Parse APFS by hand.** The partition table, checkpoints, object maps,
-   the catalog B-trees — all parsed from raw bytes in pure Python. A ready
-   forensic library I tried first broke on this very disk, exactly where my
-   own parser went through.
+2. **Parse APFS by hand.**
 
 3. **Get the data out.** The spruce-tree folder opened. Everything that had
    been locked away was back on the computer.
