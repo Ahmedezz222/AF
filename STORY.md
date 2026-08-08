@@ -1,4 +1,4 @@
-# How one spruce tree broke a $40 driver
+# How one spruce tree broke a paid driver
 
 [Читать по-русски →](STORY.ru.md)
 
@@ -7,7 +7,10 @@
 I was moving from a Mac to Windows. All my data lived on an external drive —
 a Time Machine backup formatted in APFS, macOS's native file system. Windows
 can't read those out of the box, so I installed Paragon APFS for Windows —
-a commercial driver, about $40, the standard "just works" solution.
+a commercial driver ($49.95 on the official site today), the standard
+"just works" solution. And since older Mac disks can be HFS+ instead, Paragon
+sells that as a separate product for separate money — so I ended up with two
+paid drivers instead of one.
 
 Almost everything opened. Except one folder.
 
