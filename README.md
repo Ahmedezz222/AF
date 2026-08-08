@@ -125,3 +125,7 @@ python -m yolka.dav --image backup.img
 ## License
 
 MIT
+
+---
+
+🌲 **[Читать эту страницу по-русски → README.ru.md](README.ru.md)**

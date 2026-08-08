@@ -91,3 +91,7 @@ python -m yolka --image backup.img ls /
 ## Лицензия
 
 MIT
+
+---
+
+🌲 **[Read this page in English → README.md](README.md)**
