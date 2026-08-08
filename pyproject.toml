@@ -8,7 +8,7 @@ version = "0.1.1"
 description = "Read-only APFS driver for Windows in pure Python: mounts Mac disks and Time Machine backups via built-in WebDAV"
 readme = "README.md"
 license = { text = "MIT" }
-authors = [{ name = "Olga Ivchenko", email = "novaalela@gmail.com" }]
+authors = [{ name = "lelyaiv-161", email = "enviloup
 requires-python = ">=3.10"
 keywords = ["apfs", "time-machine", "webdav", "forensics", "data-recovery", "windows"]
 classifiers = [
