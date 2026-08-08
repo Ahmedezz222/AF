@@ -1,0 +1,65 @@
+# -*- coding: utf-8 -*-
+"""Командная строка yolka.
+
+Примеры:
+    # через сервер (сервер уже запущен от администратора):
+    python -m yolka ls /
+    python -m yolka ls "2026-08-07-101512.previous/Data/Users/lelya"
+    python -m yolka extract "путь/на/диске" "C:\\куда\\положить"
+
+    # напрямую из образа или устройства (если у процесса есть права):
+    python -m yolka --image D:\\backup.img ls /
+    python -m yolka --device \\\\.\\PhysicalDrive1 ls /
+"""
+import argparse
+import sys
+
+from .apfs import RawDevice, ServerDevice, Volume
+
+
+def make_volume(args):
+    if args.image:
+        dev = RawDevice(args.image)
+    elif args.device:
+        dev = RawDevice(args.device)
+    else:
+        dev = ServerDevice(port=args.port)
+    return Volume(dev)
+
+
+def main(argv=None):
+    p = argparse.ArgumentParser(prog="yolka", description="Читатель APFS (только чтение)")
+    p.add_argument("--image", help="путь к образу диска")
+    p.add_argument("--device", help=r"raw-устройство, например \\.\PhysicalDrive1 (нужен администратор)")
+    p.add_argument("--port", type=int, default=47831, help="порт yolka-сервера (по умолчанию 47831)")
+    sub = p.add_subparsers(dest="cmd", required=True)
+
+    p_ls = sub.add_parser("ls", help="показать каталог")
+    p_ls.add_argument("path", nargs="?", default="/")
+
+    p_ex = sub.add_parser("extract", help="извлечь каталог или файл")
+    p_ex.add_argument("src")
+    p_ex.add_argument("dst")
+
+    p_info = sub.add_parser("info", help="информация о томе")
+
+    args = p.parse_args(argv)
+    vol = make_volume(args)
+
+    if args.cmd == "info":
+        print(f"том: {vol.name!r}, контрольная точка xid={vol.xid}")
+    elif args.cmd == "ls":
+        fid = vol.resolve_path(args.path)
+        for name, child in sorted(vol.list_dir(fid).items()):
+            ino = vol.get_inode(child)
+            mark = "/" if ino and (ino["mode"] & 0o170000) == 0o040000 else ""
+            size = "" if mark else f"\t{(ino or {}).get('size') or 0}"
+            print(f"{name}{mark}{size}")
+    elif args.cmd == "extract":
+        fid = vol.resolve_path(args.src)
+        vol.extract(fid, args.dst)
+        print("готово")
+
+
+if __name__ == "__main__":
+    main()
