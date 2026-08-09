@@ -5,6 +5,10 @@ r"""Сервер чтения диска. Запускается с правам
     python -m yolka.server \\.\PhysicalDrive1 [порт]
 
 Только чтение, слушает 127.0.0.1, сам выключается после 3 часов простоя.
+
+Переживает передёргивание диска: если Windows аннулировал ручку (диск
+выдернули/воткнули) — сервер находит тот же диск заново по «отпечатку»
+первых секторов, даже если номер PhysicalDrive сменился.
 """
 import os
 import socket
@@ -15,41 +19,77 @@ import time
 
 SECTOR = 4096
 IDLE_EXIT = 3 * 3600
+FINGERPRINT = 4096  # сколько байт с начала диска берём как уникальный отпечаток
+
+
+def _open_raw(path):
+    return open(path, "rb", buffering=0)
+
+
+def _read_head(f, n):
+    f.seek(0)
+    return f.read(n)
 
 
 def main(device, port=47831):
-    dev = [open(device, "rb", buffering=0)]
+    fh = _open_raw(device)
+    identity = _read_head(fh, FINGERPRINT)  # отпечаток нашего диска
+    if not identity:
+        raise IOError(f"не удалось прочитать диск {device}")
+    dev = [fh]
+    cur_path = [device]
     lock = threading.Lock()
     last = [time.time()]
 
+    def find_by_identity():
+        """Ищет наш диск среди всех PhysicalDrive по отпечатку.
+        Возвращает (path, handle) или (None, None)."""
+        # сперва пробуем прежний путь — чаще всего номер тот же
+        candidates = [cur_path[0]] + [rf"\\.\PhysicalDrive{i}" for i in range(16)]
+        for path in candidates:
+            try:
+                f = _open_raw(path)
+                if _read_head(f, FINGERPRINT) == identity:
+                    return path, f
+                f.close()
+            except OSError:
+                continue
+        return None, None
+
     def reopen():
-        """Переоткрывает устройство — лечит битую ручку после
-        передёргивания диска: Windows аннулирует старый handle,
-        и чтение начинает возвращать пустоту или падать с ошибкой."""
+        """Лечит битую ручку после передёргивания диска."""
         try:
             dev[0].close()
         except Exception:
             pass
-        dev[0] = open(device, "rb", buffering=0)
+        path, f = find_by_identity()
+        if f is None:
+            raise OSError("диск не найден (отключён?)")
+        dev[0] = f
+        cur_path[0] = path
 
     def read_aligned(offset, size):
         a_start = (offset // SECTOR) * SECTOR
         a_end = ((offset + size + SECTOR - 1) // SECTOR) * SECTOR
         want = a_end - a_start
         with lock:
-            for attempt in range(2):
+            # до 4 попыток с переоткрытием — диск после втыкания
+            # поднимается не мгновенно
+            for attempt in range(4):
                 try:
                     dev[0].seek(a_start)
                     data = dev[0].read(want)
                 except OSError:
                     data = b""
-                # непустой ответ = успех; пустой на непустой запрос = битая ручка
                 if data or want == 0:
                     return data[offset - a_start: offset - a_start + size]
-                if attempt == 0:
-                    try:
-                        reopen()  # одна попытка переоткрыть и повторить
-                    except OSError:
+                # пустой ответ на непустой запрос = битая ручка → чиним
+                try:
+                    reopen()
+                except OSError:
+                    if attempt < 3:
+                        time.sleep(0.5)  # ждём, пока диск вернётся
+                    else:
                         break
             return b""
 
